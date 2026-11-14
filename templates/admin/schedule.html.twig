@@ -1,0 +1,62 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Schedule{% endblock %}
+
+{% block admin %}
+    <header class="admin-top">
+        <div>
+            <h1>Program schedule</h1>
+            <p>Changes here update the public schedule and the on-air clock.</p>
+        </div>
+        <a class="play-btn" href="{{ path('admin_schedule_new') }}">Add a show</a>
+    </header>
+    <nav class="admin-tabs" aria-label="Board sections">
+        <a href="{{ path('admin_dashboard') }}">Overview</a>
+        <a class="is-active" href="{{ path('admin_schedule') }}">Schedule</a>
+        <a href="{{ path('admin_live') }}">Facebook Live</a>
+        <a href="{{ path('admin_team') }}">On-air team</a>
+    </nav>
+    {% if not storageReady %}
+        <article class="admin-panel">
+            <p>The schedule tables are not in the database yet. Run <code>php bin/console doctrine:migrations:migrate</code>, then reload this page.</p>
+        </article>
+    {% else %}
+        <article class="admin-panel" style="margin-bottom: 0.85rem;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Show</th>
+                        <th>Host</th>
+                        <th>Days</th>
+                        <th>Window</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slot in slots %}
+                        <tr>
+                            <td>{{ slot.title }}</td>
+                            <td>{{ slot.hostName }}</td>
+                            <td>{{ slot.weekdayLabel }}</td>
+                            <td>{{ slot.windowLabel }}</td>
+                            <td>
+                                <div class="admin-row-actions">
+                                    <a href="{{ path('admin_schedule_edit', {id: slot.id}) }}">Edit</a>
+                                    <form method="post" action="{{ path('admin_schedule_delete', {id: slot.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete-slot-' ~ slot.id) }}">
+                                        <button class="admin-danger" type="submit">Remove</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">No shows on the clock yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </article>
+        <p><a href="{{ path('schedule') }}">View the public schedule</a></p>
+    {% endif %}
+{% endblock %}

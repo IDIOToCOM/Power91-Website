@@ -14,10 +14,20 @@
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
         <server name="APP_ENV" value="test" force="true" />
+        <server name="KERNEL_CLASS" value="App\Kernel" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="APP_SECRET" value="test" force="true" />
         <server name="RADIO_STREAM_URL" value="" force="true" />
         <server name="RADIO_REQUEST_INBOX" value="requests@localhost" force="true" />
+        <server name="FACEBOOK_ACCESS_TOKEN" value="" force="true" />
+        <server name="FACEBOOK_LIVE_SOURCE" value="page" force="true" />
+        <server name="FACEBOOK_LIVE_VIDEO_ID" value="" force="true" />
+        <server name="FACEBOOK_DEMO_LIVE" value="" force="true" />
+        <server name="FACEBOOK_PAGE_ID" value="100063770387140" force="true" />
+        <server name="FACEBOOK_VIDEO_URL" value="https://www.facebook.com/100063770387140/videos/1113533604714347/" force="true" />
+        <server name="ADMIN_USERNAME" value="studio@power91.local" force="true" />
+        <server name="ADMIN_PASSWORD" value="ChangeMeAdmin91" force="true" />
+        <server name="DATABASE_URL" value="sqlite:///%kernel.project_dir%/var/data_test.db" force="true" />
     </php>
 
     <testsuites>

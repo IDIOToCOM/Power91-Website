@@ -39,10 +39,10 @@ final readonly class ScheduleSlot
 
     public function windowLabel(): string
     {
-        return sprintf('%s – %s', $this->formatHour($this->startHour), $this->formatHour($this->endHour));
+        return sprintf('%s – %s', self::formatHour($this->startHour), self::formatHour($this->endHour));
     }
 
-    private function formatHour(int $hour): string
+    public static function formatHour(int $hour): string
     {
         $normalized = $hour % 24;
         $period = $normalized >= 12 ? 'PM' : 'AM';

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Station\FacebookLiveLookup;
+use App\Station\StationBoard;
 use App\Station\StationCatalog;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -13,6 +15,8 @@ final class StationController extends AbstractController
 {
     public function __construct(
         private readonly StationCatalog $catalog,
+        private readonly StationBoard $board,
+        private readonly FacebookLiveLookup $facebookLive,
         #[Autowire('%env(RADIO_STREAM_URL)%')]
         private readonly string $streamUrl,
     ) {
@@ -25,7 +29,7 @@ final class StationController extends AbstractController
 
         return $this->render('station/home.html.twig', $this->playerContext() + [
             'shows' => $this->catalog->featuredShows(),
-            'todaySlots' => $this->catalog->slotsForWeekday((int) $now->format('N')),
+            'todaySlots' => $this->board->slotsForWeekday((int) $now->format('N')),
             'coastSpots' => $this->catalog->coastSpots(),
             'listenWays' => $this->catalog->listenWays(),
         ]);
@@ -37,7 +41,7 @@ final class StationController extends AbstractController
         $now = $this->catalog->now();
 
         return $this->render('station/schedule.html.twig', $this->playerContext() + [
-            'grid' => $this->catalog->weeklyGrid(),
+            'grid' => $this->board->weeklyGrid(),
             'today' => (int) $now->format('N'),
         ]);
     }
@@ -46,7 +50,7 @@ final class StationController extends AbstractController
     public function team(): Response
     {
         return $this->render('station/team.html.twig', $this->playerContext() + [
-            'hosts' => $this->catalog->hosts(),
+            'hosts' => $this->board->hosts(),
         ]);
     }
 
@@ -59,8 +63,9 @@ final class StationController extends AbstractController
     #[Route('/now-playing', name: 'now_playing', methods: ['GET'])]
     public function nowPlaying(): JsonResponse
     {
-        $slot = $this->catalog->onAir();
+        $slot = $this->board->onAir();
         $now = $this->catalog->now();
+        $facebookLive = $this->facebookLive->current();
 
         return $this->json([
             'title' => $slot->title,
@@ -68,6 +73,8 @@ final class StationController extends AbstractController
             'genre' => $slot->genre,
             'window' => $slot->windowLabel(),
             'clock' => $now->format('g:i:s A T'),
+            'facebookLive' => $facebookLive?->toArray(),
+            'facebookPageUrl' => $this->facebookLive->pageUrl(),
         ]);
     }
 
@@ -77,8 +84,10 @@ final class StationController extends AbstractController
     private function playerContext(): array
     {
         return [
-            'onAir' => $this->catalog->onAir(),
+            'onAir' => $this->board->onAir(),
             'streamUrl' => $this->streamUrl,
+            'facebookLive' => $this->facebookLive->current(),
+            'facebookPageUrl' => $this->facebookLive->pageUrl(),
             'stationName' => StationCatalog::NAME,
             'stationTagline' => StationCatalog::TAGLINE,
             'stationCity' => StationCatalog::CITY,

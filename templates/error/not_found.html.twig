@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Page not found</title>
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    </head>
+    <body class="admin-body">
+        <main class="admin-card">
+            <h1>Page not found</h1>
+            <p class="lede">The page you requested does not exist.</p>
+            <p><a class="play-btn" href="{{ path('home') }}">Back to Power 91</a></p>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,39 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Facebook Live{% endblock %}
+
+{% block admin %}
+    <header class="admin-top">
+        <div>
+            <h1>Facebook Live</h1>
+            <p>The homepage player follows the Power 91 page when a broadcast is detected.</p>
+        </div>
+        <a class="play-btn" href="{{ facebookPageUrl }}" rel="noopener">Open Facebook page</a>
+    </header>
+    <nav class="admin-tabs" aria-label="Board sections">
+        <a href="{{ path('admin_dashboard') }}">Overview</a>
+        <a href="{{ path('admin_schedule') }}">Schedule</a>
+        <a class="is-active" href="{{ path('admin_live') }}">Facebook Live</a>
+        <a href="{{ path('admin_team') }}">On-air team</a>
+    </nav>
+    <section class="admin-stats">
+        <article class="admin-stat {{ facebookLive ? 'admin-stat--live' }}">
+            <span>Status</span>
+            <strong>{{ facebookLive ? 'Live' : 'Off air' }}</strong>
+            <small>{{ facebookLive ? facebookLive.title : 'No broadcast on the homepage right now' }}</small>
+        </article>
+        <article class="admin-stat">
+            <span>On the radio clock</span>
+            <strong>{{ onAir.title }}</strong>
+            <small>{{ onAir.host }} · {{ onAir.windowLabel }}</small>
+        </article>
+    </section>
+    <article class="admin-panel">
+        <h2>How the player updates</h2>
+        <p>Go live on the Facebook Page the usual way. With <code>FACEBOOK_ACCESS_TOKEN</code> in <code>.env.local</code>, the homepage swaps in the broadcast on its own.</p>
+        <p>On the server, <code>php bin/console app:facebook-live:check</code> confirms auto-detect. A demo video can stand in locally when <code>FACEBOOK_DEMO_LIVE=1</code>.</p>
+        {% if facebookLive %}
+            <p><a class="text-link" href="{{ facebookLive.permalink }}">Current video permalink</a></p>
+        {% endif %}
+    </article>
+{% endblock %}

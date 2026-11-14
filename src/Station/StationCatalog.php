@@ -18,6 +18,17 @@ final class StationCatalog
     public const STUDIO_LINE = '(035) 555-0191';
     public const STUDIO_ADDRESS = 'Broadcast studio, Dumaguete City, Negros Oriental, Philippines';
     public const STUDIO_HOURS = 'Weekdays 6 AM – midnight Philippine time';
+    /**
+     * Public Facebook Page. When the studio goes live there, the homepage player
+     * follows that broadcast automatically.
+     */
+    public const FACEBOOK_PAGE_ID = '100063770387140';
+    public const FACEBOOK_PAGE_URL = 'https://www.facebook.com/'.self::FACEBOOK_PAGE_ID;
+    /**
+     * Canonical video permalink (not a /share/v/ link). Facebook's player
+     * can embed this; share URLs and /live often fail in an iframe.
+     */
+    public const FACEBOOK_VIDEO_URL = 'https://www.facebook.com/'.self::FACEBOOK_PAGE_ID.'/videos/1113533604714347/';
 
     /**
      * @return list<Show>
@@ -105,6 +116,7 @@ final class StationCatalog
     public function listenWays(): array
     {
         return [
+            ['name' => 'Facebook Live', 'note' => 'Shows on the homepage when the studio is live'],
             ['name' => 'Live stream', 'note' => 'Player on every page'],
             ['name' => 'Studio clock', 'note' => 'Philippine time, all day'],
             ['name' => 'Song requests', 'note' => 'Read on air when it fits'],
@@ -113,8 +125,7 @@ final class StationCatalog
     }
 
     /**
-     * On-air team. Edit a Host() to rename someone. Copy a Host() block to add someone.
-     * The On-air Team page lists everyone here automatically — no extra files.
+     * Default on-air team, used until the studio board saves its own list.
      *
      * @return list<Host>
      */
@@ -165,6 +176,8 @@ final class StationCatalog
     }
 
     /**
+     * Default program clock, used until the studio board saves its own grid.
+     *
      * @return list<ScheduleSlot>
      */
     public function schedule(): array
@@ -196,11 +209,14 @@ final class StationCatalog
         return $at->setTimezone($timezone);
     }
 
-    public function onAir(?\DateTimeImmutable $at = null): ScheduleSlot
+    /**
+     * @param list<ScheduleSlot>|null $slots
+     */
+    public function onAir(?\DateTimeImmutable $at = null, ?array $slots = null): ScheduleSlot
     {
         $time = $this->now($at);
 
-        foreach ($this->schedule() as $slot) {
+        foreach ($slots ?? $this->schedule() as $slot) {
             if ($slot->isLiveAt($time)) {
                 return $slot;
             }
@@ -210,33 +226,38 @@ final class StationCatalog
     }
 
     /**
+     * @param list<ScheduleSlot>|null $slots
+     *
      * @return list<ScheduleSlot>
      */
-    public function slotsForWeekday(int $weekday): array
+    public function slotsForWeekday(int $weekday, ?array $slots = null): array
     {
-        $slots = array_values(array_filter(
-            $this->schedule(),
+        $matched = array_values(array_filter(
+            $slots ?? $this->schedule(),
             static fn (ScheduleSlot $slot): bool => $slot->airsOn($weekday),
         ));
 
-        usort($slots, static fn (ScheduleSlot $a, ScheduleSlot $b): int => $a->startHour <=> $b->startHour);
+        usort($matched, static fn (ScheduleSlot $a, ScheduleSlot $b): int => $a->startHour <=> $b->startHour);
 
-        return $slots;
+        return $matched;
     }
 
     /**
+     * @param list<ScheduleSlot>|null $slots
+     *
      * @return list<array{name: string, weekday: int, slots: list<ScheduleSlot>}>
      */
-    public function weeklyGrid(): array
+    public function weeklyGrid(?array $slots = null): array
     {
         $names = [1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday', 7 => 'Sunday'];
         $grid = [];
+        $source = $slots ?? $this->schedule();
 
         foreach ($names as $weekday => $name) {
             $grid[] = [
                 'name' => $name,
                 'weekday' => $weekday,
-                'slots' => $this->slotsForWeekday($weekday),
+                'slots' => $this->slotsForWeekday($weekday, $source),
             ];
         }
 

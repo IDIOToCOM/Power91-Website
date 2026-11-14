@@ -1,0 +1,46 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}On-air team{% endblock %}
+
+{% block admin %}
+    <header class="admin-top">
+        <div>
+            <h1>On-air team</h1>
+            <p>Changes here update the public team page.</p>
+        </div>
+        <a class="play-btn" href="{{ path('admin_team_new') }}">Add a host</a>
+    </header>
+    <nav class="admin-tabs" aria-label="Board sections">
+        <a href="{{ path('admin_dashboard') }}">Overview</a>
+        <a href="{{ path('admin_schedule') }}">Schedule</a>
+        <a href="{{ path('admin_live') }}">Facebook Live</a>
+        <a class="is-active" href="{{ path('admin_team') }}">On-air team</a>
+    </nav>
+    {% if not storageReady %}
+        <article class="admin-panel">
+            <p>The team table is not in the database yet. Run <code>php bin/console doctrine:migrations:migrate</code>, then reload this page.</p>
+        </article>
+    {% else %}
+        <div class="admin-host-grid">
+            {% for host in hosts %}
+                <article class="admin-panel">
+                    <span class="admin-kicker">{{ host.role }}</span>
+                    <h2>{{ host.name }}</h2>
+                    <p>{{ host.showName }}</p>
+                    <p>{{ host.bio }}</p>
+                    <div class="admin-row-actions">
+                        <a href="{{ path('admin_team_edit', {id: host.id}) }}">Edit</a>
+                        <form method="post" action="{{ path('admin_team_delete', {id: host.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete-host-' ~ host.id) }}">
+                            <button class="admin-danger" type="submit">Remove</button>
+                        </form>
+                    </div>
+                </article>
+            {% else %}
+                <article class="admin-panel">
+                    <p>No hosts yet.</p>
+                </article>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

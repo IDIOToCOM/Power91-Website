@@ -1,0 +1,98 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Overview{% endblock %}
+
+{% block admin %}
+    <header class="admin-top">
+        <div>
+            <h1>Hi, welcome back <span class="admin-hello" aria-hidden="true">👋</span></h1>
+            <p>Dumaguete studio board for {{ now|date('l, M j, Y') }}.</p>
+        </div>
+        <div class="admin-tools">
+            <span class="admin-date">{{ now|date('M j, Y') }} · Philippine time</span>
+            <a class="play-btn" href="{{ path('schedule') }}">Open schedule</a>
+        </div>
+    </header>
+
+    <nav class="admin-tabs" aria-label="Board sections">
+        <a class="is-active" href="{{ path('admin_dashboard') }}">Overview</a>
+        <a href="{{ path('admin_schedule') }}">Schedule</a>
+        <a href="{{ path('admin_live') }}">Facebook Live</a>
+        <a href="{{ path('admin_team') }}">On-air team</a>
+    </nav>
+
+    <section class="admin-stats" aria-label="Station snapshot">
+        <article class="admin-stat">
+            <span>Featured shows</span>
+            <strong>{{ showCount }}</strong>
+            <small>On the public program grid</small>
+        </article>
+        <article class="admin-stat">
+            <span>On-air hosts</span>
+            <strong>{{ hostCount }}</strong>
+            <small>Listed on the team page</small>
+        </article>
+        <article class="admin-stat">
+            <span>On air now</span>
+            <strong>{{ onAir.title }}</strong>
+            <small>{{ onAir.host }} · {{ onAir.windowLabel }}</small>
+        </article>
+        <article class="admin-stat {{ facebookLive ? 'admin-stat--live' }}">
+            <span>Facebook</span>
+            <strong>{{ facebookLive ? 'Live' : 'Off air' }}</strong>
+            <small>{{ facebookLive ? facebookLive.title : 'Homepage waits for the next broadcast' }}</small>
+        </article>
+    </section>
+
+    <section class="admin-board">
+        <article class="admin-panel">
+            <div class="admin-chart-head">
+                <div>
+                    <h2>Today’s board</h2>
+                    <p class="admin-kicker">Airtime blocks for the last daypart set</p>
+                </div>
+            </div>
+            <div class="admin-split">
+                <div>
+                    <span>On the clock</span>
+                    <strong>{{ onAir.title }}</strong>
+                </div>
+                <div>
+                    <span>Today’s blocks</span>
+                    <strong>{{ todaySlots|length }}</strong>
+                </div>
+            </div>
+            <div class="admin-bars" aria-hidden="true">
+                {% for slot in todaySlots %}
+                    {% set hours = slot.endHour > slot.startHour ? slot.endHour - slot.startHour : (24 - slot.startHour) + slot.endHour %}
+                    <div class="admin-bar {{ slot.title == onAir.title ? 'is-now' }}">
+                        <i style="height: {{ (hours / maxHours * 100)|round }}%"></i>
+                        <em>{{ slot.title }}</em>
+                    </div>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="admin-panel">
+            <h2>Coming up</h2>
+            <p class="admin-kicker">{{ todaySlots|length }} blocks on today’s clock</p>
+            <ul class="admin-feed">
+                {% for slot in todaySlots %}
+                    {% set initials = '' %}
+                    {% for part in slot.host|split(' ') %}
+                        {% if part|first matches '/^[A-Za-z]$/' %}
+                            {% set initials = initials ~ part|first|upper %}
+                        {% endif %}
+                    {% endfor %}
+                    <li>
+                        <span class="admin-avatar">{{ initials|slice(0, 2) }}</span>
+                        <span>
+                            <strong>{{ slot.title }}</strong>
+                            <span>{{ slot.host }}</span>
+                        </span>
+                        <b>{{ slot.windowLabel }}</b>
+                    </li>
+                {% endfor %}
+            </ul>
+        </article>
+    </section>
+{% endblock %}

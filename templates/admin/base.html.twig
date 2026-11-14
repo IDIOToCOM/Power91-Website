@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noindex, nofollow">
+        <title>{% block title %}Studio board{% endblock %} — Power 91</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><rect width=%22128%22 height=%22128%22 rx=%2224%22 fill=%22%231a237e%22/><text y=%2286%22 x=%2214%22 font-size=%2264%22 font-family=%22Arial Black,sans-serif%22 fill=%22%23e53935%22>91</text></svg>">
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    </head>
+    <body class="admin-shell">
+        <div class="admin-app">
+            <aside class="admin-side">
+                <a class="admin-side-brand" href="{{ path('admin_dashboard') }}">
+                    <img class="admin-side-logo" src="{{ asset('images/power91-logo.webp') }}" alt="">
+                    <span>
+                        <strong>Power 91</strong>
+                        <span>Studio board</span>
+                    </span>
+                </a>
+                <nav aria-label="Studio">
+                    <a href="{{ path('admin_dashboard') }}" class="{{ section == 'overview' ? 'is-active' }}">Overview</a>
+                    <a href="{{ path('admin_schedule') }}" class="{{ section == 'schedule' ? 'is-active' }}">Schedule</a>
+                    <a href="{{ path('admin_live') }}" class="{{ section == 'live' ? 'is-active' }}">Facebook Live</a>
+                    <a href="{{ path('admin_team') }}" class="{{ section == 'team' ? 'is-active' }}">On-air team</a>
+                </nav>
+                <div class="admin-side-foot">
+                    <span>{{ adminUsername }}</span>
+                    <form class="admin-logout-form" method="post" action="{{ logout_path() }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                        <button class="admin-logout-btn" type="submit">Log out</button>
+                    </form>
+                </div>
+            </aside>
+            <main class="admin-main">
+                {% for message in app.flashes('success') %}
+                    <p class="admin-flash">{{ message }}</p>
+                {% endfor %}
+                {% block admin %}{% endblock %}
+            </main>
+        </div>
+    </body>
+</html>

@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Dto\ContactMessage;
 use App\Form\ContactType;
+use App\Station\FacebookLiveLookup;
+use App\Station\StationBoard;
 use App\Station\StationCatalog;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -17,7 +19,8 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ContactController extends AbstractController
 {
     public function __construct(
-        private readonly StationCatalog $catalog,
+        private readonly StationBoard $board,
+        private readonly FacebookLiveLookup $facebookLive,
         private readonly MailerInterface $mailer,
         #[Autowire('%env(RADIO_STREAM_URL)%')]
         private readonly string $streamUrl,
@@ -50,8 +53,10 @@ final class ContactController extends AbstractController
 
         $response = $this->render('station/contact.html.twig', [
             'form' => $form,
-            'onAir' => $this->catalog->onAir(),
+            'onAir' => $this->board->onAir(),
             'streamUrl' => $this->streamUrl,
+            'facebookLive' => $this->facebookLive->current(),
+            'facebookPageUrl' => $this->facebookLive->pageUrl(),
             'stationName' => StationCatalog::NAME,
             'stationTagline' => StationCatalog::TAGLINE,
             'stationCity' => StationCatalog::CITY,

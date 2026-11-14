@@ -15,7 +15,10 @@
         </div>
         <div class="player-actions">
             {% include 'station/_clock.html.twig' with {class: 'player-clock', with_zone: true} %}
-            <span class="player-status" data-player-target="status">{{ streamUrl ? 'Ready to stream' : 'Add a stream URL to go live' }}</span>
+            <span class="player-status" data-player-target="status">{{ facebookLive ? (facebookLive.detectedLive ? 'Live on Facebook' : 'Facebook Live ready') : (streamUrl ? 'Ready to stream' : 'Add a stream URL to go live') }}</span>
+            {% if facebookLive %}
+                <a class="play-btn" href="{{ path('home') }}#facebook-live">Watch live</a>
+            {% endif %}
             <button class="play-btn" type="button" data-player-target="button" data-action="player#toggle">
                 Listen live
             </button>

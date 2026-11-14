@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noindex, nofollow">
+        <title>Studio sign-in — Power 91</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><rect width=%22128%22 height=%22128%22 rx=%2224%22 fill=%22%231a237e%22/><text y=%2286%22 x=%2214%22 font-size=%2264%22 font-family=%22Arial Black,sans-serif%22 fill=%22%23e53935%22>91</text></svg>">
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    </head>
+    <body class="admin-body">
+        <main class="admin-card">
+            <img class="admin-login-logo" src="{{ asset('images/power91-logo.webp') }}" alt="Power 91">
+            <p class="eyebrow">91.7 DYGB-FM · Dumaguete</p>
+            <h1>Studio board</h1>
+            <p class="lede">Sign in with your username.</p>
+            {% if error %}
+                <p class="login-error" role="alert">Username or password is not correct.</p>
+            {% endif %}
+            <form class="contact-form" method="post" action="{{ path('admin_login') }}" novalidate>
+                <label>
+                    Username
+                    <input type="text" name="username" value="{{ last_username }}" autocomplete="username" required>
+                </label>
+                <label>
+                    Password
+                    <span class="password-field" data-controller="password">
+                        <input data-password-target="input" data-action="input->password#peek" type="password" name="password" autocomplete="current-password" required>
+                        <button class="password-toggle" data-password-target="toggle" data-action="password#toggle" type="button" aria-pressed="false">Show</button>
+                    </span>
+                </label>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <button class="play-btn" type="submit">Sign in</button>
+            </form>
+        </main>
+    </body>
+</html>

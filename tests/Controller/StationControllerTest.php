@@ -15,6 +15,9 @@ final class StationControllerTest extends WebTestCase
         self::assertSelectorTextContains('h1', 'Music from every decade');
         self::assertSelectorExists('#live-player');
         self::assertSelectorExists('#live-player [data-controller="clock"]');
+        self::assertSelectorExists('#facebook-live');
+        self::assertSelectorExists('#facebook-live iframe');
+        self::assertGreaterThan(0, $crawler->filter('a[href="#facebook-live"]')->count());
         self::assertGreaterThan(0, $crawler->filter('[data-controller="clock"]')->count());
         self::assertSelectorTextContains('#program-schedule h2', 'Program Schedule');
         self::assertSelectorTextContains('.site-footer', 'Our Station Address');
@@ -51,7 +54,11 @@ final class StationControllerTest extends WebTestCase
         $payload = json_decode($client->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         self::assertArrayHasKey('title', $payload);
         self::assertArrayHasKey('host', $payload);
+        self::assertArrayHasKey('facebookLive', $payload);
         self::assertNotSame('', $payload['title']);
+        self::assertIsArray($payload['facebookLive']);
+        self::assertArrayHasKey('embedUrl', $payload['facebookLive']);
+        self::assertStringContainsString('facebook.com/plugins/video.php', $payload['facebookLive']['embedUrl']);
     }
 
     public function testContactFormRejectsEmptySubmission(): void

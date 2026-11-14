@@ -2,22 +2,32 @@
 setlocal
 cd /d "%~dp0"
 
-docker info >nul 2>&1
-if not errorlevel 1 goto :docker
-
 php -v >nul 2>&1
-if errorlevel 1 goto :need
+if errorlevel 1 goto :try_docker
+php -r "exit(extension_loaded('mbstring') ? 0 : 1);" >nul 2>&1
+if errorlevel 1 goto :try_docker
+php -r "exit(extension_loaded('pdo_sqlite') ? 0 : 1);" >nul 2>&1
+if errorlevel 1 goto :try_docker
 composer -V >nul 2>&1
-if errorlevel 1 goto :need
+if errorlevel 1 goto :try_docker
 
 echo Installing PHP packages (one-time after clone)...
 composer install --no-interaction
 if errorlevel 1 goto :fail
+php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
+if errorlevel 1 goto :fail
+php bin/console app:seed-admin --no-interaction
+if errorlevel 1 goto :fail
 echo.
-echo Site: http://127.0.0.1:8000
+echo Site: http://127.0.0.1:8080
 echo Keep this window open. Close it to stop the site.
-php -S 127.0.0.1:8000 -t public public/dev-server.php
+php -S 127.0.0.1:8080 -t public public/dev-server.php
 exit /b %ERRORLEVEL%
+
+:try_docker
+docker info >nul 2>&1
+if errorlevel 1 goto :need
+
 
 :docker
 echo Starting Power 91 with Docker. The first launch can take several minutes.

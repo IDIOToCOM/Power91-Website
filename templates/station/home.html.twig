@@ -5,14 +5,17 @@
 {% block body %}
 <section class="hero">
     <div class="hero-panel">
-        <div class="shell hero-copy">
-            <p class="hero-kicker">{{ stationCity }}</p>
-            <h1>Music from every decade, still loud enough for the boulevard.</h1>
-            <p class="lede">Power 91 is Dumaguete’s variety station: hits, deep cuts, requests, and hosts who actually live in the city.</p>
-            <div class="hero-actions">
-                <a class="play-btn play-btn--hero" href="#live-player">Listen live</a>
-                <a class="ghost-link" href="{{ path('schedule') }}">See the program schedule</a>
+        <div class="shell hero-layout">
+            <div class="hero-copy">
+                <p class="hero-kicker">{{ stationCity }}</p>
+                <h1>Music from every decade, still loud enough for the boulevard.</h1>
+                <p class="lede">Power 91 is Dumaguete’s variety station: hits, deep cuts, requests, and hosts who actually live in the city.</p>
+                <div class="hero-actions">
+                    <a class="play-btn play-btn--hero" href="#facebook-live">Watch Facebook Live</a>
+                    <a class="ghost-link" href="{{ path('schedule') }}">See the program schedule</a>
+                </div>
             </div>
+            {% include 'station/_facebook_live.html.twig' %}
         </div>
     </div>
 </section>

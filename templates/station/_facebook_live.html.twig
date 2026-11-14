@@ -1,0 +1,38 @@
+<div
+    id="facebook-live"
+    class="facebook-live{% if class is defined %} {{ class }}{% endif %}"
+    data-controller="facebook-live"
+    data-facebook-live-now-playing-url-value="{{ path('now_playing') }}"
+    data-facebook-live-embed-url-value="{{ facebookLive ? facebookLive.embedUrl() : '' }}"
+>
+    <div class="facebook-live-stage" data-facebook-live-target="stage"{% if not facebookLive %} hidden{% endif %}>
+        <div class="facebook-live-frame">
+            {% if facebookLive %}
+                <iframe
+                    data-facebook-live-target="frame"
+                    title="Power 91 Facebook Live"
+                    src="{{ facebookLive.embedUrl() }}"
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="lazy"
+                ></iframe>
+            {% else %}
+                <iframe
+                    data-facebook-live-target="frame"
+                    title="Power 91 Facebook Live"
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="lazy"
+                ></iframe>
+            {% endif %}
+        </div>
+        <p class="facebook-live-caption">
+            <span data-facebook-live-target="badge">{{ facebookLive and facebookLive.detectedLive ? 'Live on Facebook' : 'Facebook Live' }}</span>
+            <span data-facebook-live-target="title">{{ facebookLive ? facebookLive.title : 'The studio player appears here when Power 91 goes live.' }}</span>
+            <a data-facebook-live-target="link" href="{{ facebookLive ? facebookLive.permalink : facebookPageUrl }}" rel="noopener noreferrer" target="_blank">Open on Facebook</a>
+        </p>
+    </div>
+    <p class="facebook-live-offline" data-facebook-live-target="offline"{% if facebookLive %} hidden{% endif %}>
+        When Power 91 goes live on Facebook, the stream plays here automatically.
+    </p>
+</div>
